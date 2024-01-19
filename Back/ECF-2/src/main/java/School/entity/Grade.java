@@ -23,6 +23,9 @@ public class Grade {
     @JoinColumn(name = "id_student", nullable = false)
     private Student idStudent;
 
+    public Grade() {
+    }
+
     public Integer getId() {
         return id;
     }

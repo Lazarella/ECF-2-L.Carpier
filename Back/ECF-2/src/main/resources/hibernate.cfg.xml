@@ -7,7 +7,13 @@
 
 
     <session-factory>
-
+<mapping class="School.entity.Departement"/>
+<mapping class="School.entity.Teacher"/>
+<mapping class="School.entity.Student"/>
+<mapping class="School.entity.Subject"/>
+<mapping class="School.entity.Evaluation"/>
+<mapping class="School.entity.EvaluationId"/>
+<mapping class="School.entity.Grade"/>
     </session-factory>
 
 </hibernate-configuration>

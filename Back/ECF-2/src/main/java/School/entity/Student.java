@@ -26,6 +26,9 @@ public class Student {
     @JoinColumn(name = "id_grade", nullable = false)
     private Grade idGrade;
 
+    public Student() {
+    }
+
     public String getIdStudent() {
         return idStudent;
     }

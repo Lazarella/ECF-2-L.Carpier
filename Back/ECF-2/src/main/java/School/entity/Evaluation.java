@@ -19,6 +19,9 @@ public class Evaluation {
     @JoinColumn(name = "id_student", nullable = false)
     private Student idStudent;
 
+    public Evaluation() {
+    }
+
     @Column(name = "id_evaluation")
     private Integer idEvaluation;
 

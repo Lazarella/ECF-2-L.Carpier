@@ -19,6 +19,10 @@ public class Departement {
     @JoinColumn(name = "id_grade", nullable = false)
     private Grade idGrade;
 
+    public Departement() {
+
+    }
+
     public String getName() {
         return name;
     }

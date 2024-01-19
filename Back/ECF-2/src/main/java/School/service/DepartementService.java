@@ -1,21 +1,23 @@
 package School.service;
 
-import School.dao.impl.Repository;
+import School.dao.Repository;
+import School.dao.impl.DepartementDAOImp;
 import School.entity.Departement;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
 
-public class DepartementService extends BaseService implements Repository<Departement> {
+public class DepartementService extends BaseService  {
     public DepartementService() {super();}
+    public DepartementDAOImp departementDao = new DepartementDAOImp(session);
 
     public boolean create (Departement d) {
         session = sessionFactory.openSession();
         try {
             session.getTransaction().begin();
             d.setName(d.getName());
-            session.save(d);
+            departementDao.create(d);
             session.getTransaction().commit();
         } catch (Exception e) {
             e.getMessage();
@@ -29,12 +31,12 @@ public class DepartementService extends BaseService implements Repository<Depart
         }
     }
 
-    @Override
+
     public boolean delete(Long id) {
         session = sessionFactory.openSession();
         try {
             session.getTransaction().begin();
-            session.delete(id);
+            departementDao.delete(id);
             session.getTransaction().commit();
         } catch (Exception e) {
             if (session.getTransaction() != null) {
@@ -50,20 +52,12 @@ public class DepartementService extends BaseService implements Repository<Depart
         }
     }
 
-    @Override
-    public boolean findByName(String str) {
 
-            session = sessionFactory.openSession();
+    public Departement findByName(String str) {
+
         try {
-            String sql = "SELECT * FROM departement WHERE name_departement = :name";
-            Query query = session.createNativeQuery(sql, Departement.class);
-            query.setParameter("name", str);
-            Departement departement = (Departement) query.getSingleResult();
-
-            if (departement == null) {
-                System.out.println("Ce département n'existe pas!");
-                return false;
-            }
+            session = sessionFactory.openSession();
+            departementDao.findByName(str);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,25 +69,30 @@ public class DepartementService extends BaseService implements Repository<Depart
         }
     }
 
-    @Override
-    public Departement findById(int id) {
-        session = session.getSessionFactory().openSession();
-        Departement departement = null;
 
-        departement = (Departement) session.get(Departement.class, id);
-        session.close();
-        return departement;
+    public Departement findById(int id) {
+        try {
+            session = session.getSessionFactory().openSession();
+            Departement departement = null;
+            departement = (Departement) departementDao.findById(id);
+            return departement;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
-    @Override
+
     public List<Departement> findAll() {
-        session = sessionFactory.openSession();
         try {
-            String sql = "SELECT * FROM departement";
-            Query<Departement> query = session.createNativeQuery(sql, Departement.class);
-            return query.getResultList();
+        session = sessionFactory.openSession();
+        return departementDao.findAll();
         } catch (Exception e) {
-            e.printStackTrace(); // Remplacez par un logger approprié dans votre projet
+            e.printStackTrace();
             return null;
         } finally {
             if (session != null) {

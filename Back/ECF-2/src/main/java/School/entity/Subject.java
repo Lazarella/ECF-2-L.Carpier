@@ -25,6 +25,17 @@ public class Subject {
     @Column(name = "coefficient", precision = 15, scale = 2)
     private BigDecimal coefficient;
 
+    public Subject() {
+    }
+
+    public Subject(Integer id, String titled, String description, Integer duration, BigDecimal coefficient) {
+        this.id = id;
+        this.titled = titled;
+        this.description = description;
+        this.duration = duration;
+        this.coefficient = coefficient;
+    }
+
     public Integer getId() {
         return id;
     }

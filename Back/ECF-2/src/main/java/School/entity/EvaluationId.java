@@ -16,6 +16,9 @@ public class EvaluationId implements Serializable {
     @Column(name = "id_student", nullable = false, length = 50)
     private String idStudent;
 
+    public EvaluationId() {
+    }
+
     public Integer getIdSubject() {
         return idSubject;
     }

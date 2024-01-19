@@ -1,4 +1,4 @@
-package School.dao.impl;
+package School.dao;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public interface Repository<T>{
 
     boolean delete(Long id);
 
-   boolean findByName(String str);
+  T findByName(String str);
 
     T findById(int id);
 

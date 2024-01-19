@@ -1,15 +1,20 @@
 package School.controller;
 
 import School.entity.Departement;
+import School.entity.Grade;
+import School.entity.Student;
+import School.entity.Teacher;
 import School.service.*;
 
 import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
 import java.time.Period;
+import java.util.regex.Pattern;
 
 public class IHM {
 
@@ -119,13 +124,21 @@ public class IHM {
 
     }
 
-    private void createTeacher(){
+    private void createTeacher() {
         Random rand = new Random();
+        Teacher teacher = new Teacher();
+        int randomNumber = rand.nextInt(10000);
+        teacher.setRegistration("T" + String.valueOf(randomNumber));
+
         System.out.println("  (｡･∀･)ﾉﾞ  Bienvenue à la nouvelle recrue （＾∀＾●）ﾉｼ");
         System.out.println("Quel est votre prénom?");
         String teacherName = getInput(scan);
+        teacher.setNameTeacher(teacherName);
+
         System.out.println("Quel est votre nom de famille?");
         String teacherLastName = getInput(scan);
+        teacher.setLastnameTeacher(teacherLastName);
+
         System.out.println("Quelle est votre Date de naissance (AAAA-MM-JJ)");
         LocalDate birthdate = null;
         boolean isValidDate = false;
@@ -138,6 +151,7 @@ public class IHM {
                 if (Period.between(birthdate, LocalDate.now()).getYears() < 18) {
                     System.out.println("Vous devez avoir au moins 18 ans.");
                 } else {
+                    teacher.setBirthdateTeacher(birthdate);
                     isValidDate = true;
                 }
             } catch (DateTimeParseException e) {
@@ -147,29 +161,106 @@ public class IHM {
         System.out.println("A quelle maison êtes vous rattaché?");
         String teacherDepartement = scan.next();
 
-        try{
-            getDepartementByName
+        try {
+            Departement departement = departementService.findByName(teacherDepartement);
+            if (departement == null) {
+                System.out.println("Cette maison n'existe pas! ");
+            } else {
+                teacher.setIdDepartement(departement);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        System.out.println("Etes vous le professeur référent de cette Maison O/N");
+        String teacherIsHead = scan.next().trim().toUpperCase();
 
+        switch (teacherIsHead) {
+            case "O" -> {
+                System.out.println("On va vérifier ça petit malin");
+                teacher.setIsHeadDepartment(true);
+                //todo méthode vérification : 1 - chercher tout les professeurs d'un département dont le bool Is head est set à true ; si le résultat est nul, alors le nouvel élément peut devenir chef du département
+            }
+            case "N" ->
+                teacher.setIsHeadDepartment(false);
+
+            default ->
+                System.out.println("Je n'ai pas compris");
+
+        }
+        teacher.setIsPrincipal(false);
+        teacherService.create(teacher);
     }
-    private String getInput(Scanner scan) {
-        String input = "";
-        boolean isValid = false;
-        while (!isValid) {
+
+    private void createStudent() {
+        Student student = new Student();
+        System.out.println("  (｡･∀･)ﾉﾞ  Bienvenue au nouvel.le élève! （＾∀＾●）ﾉｼ");
+
+        System.out.println("Veuillez entrer le prénom de l'élève");
+        String name = getInput(scan);
+        student.setNameStudent(name);
+
+        System.out.println("Veuillez entrer le nom de famille de l'élève");
+        String lastName = getInput(scan);
+        student.setLastNameStudent(lastName);
+
+        System.out.println("Veuillez entrez la date de naissance de l'élève");
+        String dateInput = scan.nextLine().trim();
+        LocalDate birthdate = null;
+        boolean isValidDate = false;
+        while (!isValidDate) {
             try {
-                input = scan.nextLine().trim();
-                if (input.isEmpty() || input.length() < 3 || !input.matches("[a-zA-Z]+")) {
-                    throw new IllegalArgumentException("Le nom (ou prénom) doit faire plus de trois caractères et ne doit contenir que des lettres !");
-                }
-                isValid = true;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                birthdate = LocalDate.parse(dateInput, formatter);
+                student.setBirthdateStudent(birthdate);
+            } catch (DateTimeParseException e) {
+                System.out.println("Format de date invalide. Veuillez réessayer.");
             }
         }
-        return input;
+
+        System.out.println("Veuillez entrer l'email de l'élève (au cas ou les chouettes fassent grève)");
+        String mail = scan.next();
+        Boolean checkMail = Pattern.matches(".*@gmail\\.com$", mail); // méthode de codeurjava.com
+        if (checkMail) {
+            student.setMail(mail);
+        } else {
+            System.out.println("Le mail de l'étudiant doit finir par '@gmail.com', on a des actions!");
+        }
+        System.out.println("A quel classe apartient lélève?");
+        String grade = scan.next();
+        try {
+            Grade gradeStudent = gradeService.findByName(grade);
+            if (grade == null) {
+                System.out.println("Cette classe n'existe pas! ");
+            } else {
+               student.setIdGrade(gradeStudent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-}
+
+        private String getInput(Scanner scan){
+            String input = "";
+            boolean isValid = false;
+            while (!isValid) {
+                try {
+                    input = scan.nextLine().trim();
+                    if (input.isEmpty() || input.length() < 3 || !input.matches("[a-zA-Z]+")) {
+                        throw new IllegalArgumentException("Le nom (ou prénom) doit faire plus de trois caractères et ne doit contenir que des lettres !");
+                    }
+                    isValid = true;
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            return input;
+        }
+
+
+    }
 
 }
 
