@@ -20,3 +20,5 @@ public abstract class BaseService {
 
     }
 }
+
+// todo mettre la connection principale dans le main (pour qu'il n'y ai qu'une connection principale pour toute l'application

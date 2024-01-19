@@ -1,11 +1,11 @@
 package School.controller;
 
-import School.entity.Departement;
-import School.entity.Grade;
-import School.entity.Student;
-import School.entity.Teacher;
+import School.entity.*;
 import School.service.*;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import java.math.BigDecimal;
 import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,9 +36,10 @@ public class IHM {
         this.scan = new Scanner(System.in);
     }
 
-    public  void start() {
+    public void start() {
         String choice;
         do {
+
             menu();
             choice = scan.nextLine();
             switch (choice) {
@@ -79,17 +80,18 @@ public class IHM {
                     deleteStudent();
                     break;
                 case "13":
-                    deleteStudentFromGrade
-                            break;
-                case "14" :
+                    deleteStudentFromGrade();
+                    break;
+                case "14":
                     deleteDepartement();
                     break;
                 default:
                     System.out.println("Je n'ai pas compris");
             }
-        }while(!choice.equals("0"));
-        produitService.end();
+        } while (!choice.equals("0"));
+        //sessionFactory.close();
     }
+
     private void menu() {
         System.out.println("⁂ ﾉ◕ヮ◕)ﾉ*:･ﾟ✧  Bienvenue à Poudlard      ᓚᘏᗢ ⁂ ");
         System.out.println("1 -- Créer une maison (ou un département)");
@@ -111,17 +113,16 @@ public class IHM {
 
     }
 
-    private void createDepartement(){
+    private void createDepartement() {
         System.out.println("Quel est le nom de notre nouvelle maison?");
 
         String departementName = scan.nextLine().trim();
 
-        try{
+        try {
             departementService.create(new Departement(departementName));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     private void createTeacher() {
@@ -181,11 +182,9 @@ public class IHM {
                 teacher.setIsHeadDepartment(true);
                 //todo méthode vérification : 1 - chercher tout les professeurs d'un département dont le bool Is head est set à true ; si le résultat est nul, alors le nouvel élément peut devenir chef du département
             }
-            case "N" ->
-                teacher.setIsHeadDepartment(false);
+            case "N" -> teacher.setIsHeadDepartment(false);
 
-            default ->
-                System.out.println("Je n'ai pas compris");
+            default -> System.out.println("Je n'ai pas compris");
 
         }
         teacher.setIsPrincipal(false);
@@ -233,16 +232,92 @@ public class IHM {
             if (grade == null) {
                 System.out.println("Cette classe n'existe pas! ");
             } else {
-               student.setIdGrade(gradeStudent);
+                student.setIdGrade(gradeStudent);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        studentService.create(student);
 
     }
 
+    private void createSubject() {
+        System.out.println("Etoffons notre catalogue de matières!");
+        Subject subject = new Subject();
 
-        private String getInput(Scanner scan){
+        System.out.println("Quelle est le nom de la nouvelle matière?");
+        String titled = scan.nextLine().trim();
+        subject.setTitled(titled);
+
+        System.out.println("Décrivez la matière en quelques mots");
+        String description = scan.nextLine().trim();
+        subject.setDescription(description);
+
+        System.out.println("Combien de temps dure un cours? (en heure)");
+        int duration = scan.nextInt();
+        subject.setDuration(duration);
+
+        System.out.println("Quel est le coefficient de la matière (de 1 à 5 inclus)");
+        BigDecimal coef = scan.nextBigDecimal(); //Jpa buddy a généré cette étonnant type...
+        if (coef.compareTo(BigDecimal.ONE) <= 5 && coef.compareTo(BigDecimal.ONE) >= 1) {
+            subject.setCoefficient(coef);
+        } else {
+            System.out.println("Heureusement, vous ne vouliez pas enseigner les mathématiques o(≧∀≦)o");
+        }
+
+        subjectService.create(subject);
+
+    }
+
+    private void addEvaluation() {
+        Evaluation eval = new Evaluation();
+        System.out.println("C'est l'heure dévaluer ces chers petits");
+        System.out.println("Entrer l'identifiant numérique de l'élève à évaluer");
+        int idStudent = scan.nextInt();
+        Student student = studentService.findById(idStudent);
+        if (student != null) {
+            eval.setIdStudent(student);
+        } else {
+            System.out.println("l'élève est introuvable");
+        }
+        System.out.println("pour quelle matière l'élève va-t-il être évaluer? (entrez l'id");
+        int idSubject = scan.nextInt();
+        Subject subject = subjectService.findById(idSubject);
+        if (subject!= null) {
+            eval.setIdSubject(subject);
+        } else {
+            System.out.println("Cette matière n'est pas enseignée chez nous on dirait ...");
+        }
+        System.out.println("Quelle est la valeur de la note?");
+       BigDecimal valueEval = scan.nextBigDecimal();
+       // la valeur est vérifié dans la base de donnée
+       eval.setValue(valueEval);
+        System.out.println("Ajoutez un commentaire");
+        String comment = scan.nextLine().trim();
+        eval.setComment(comment);
+        evaluationService.create(eval);
+    }
+
+    private void addGrade(){
+
+    }
+    private void displayStudent(){
+
+    }
+    private void displayStudentBySubject(){
+
+    }
+    private void dispalyEvaluationFromStudent(){
+
+    }
+    private void displayStudentByDepartement(){
+
+    }
+    private void displayStudentByLevelGrade(){}
+    private void deleteStudent(){}
+    private void deleteStudentFromGrade(){}
+    private void deleteDepartement(){}
+    private String getInput(Scanner scan){
             String input = "";
             boolean isValid = false;
             while (!isValid) {
@@ -262,5 +337,5 @@ public class IHM {
 
     }
 
-}
+
 

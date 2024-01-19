@@ -49,15 +49,15 @@ public class GradeService extends  BaseService {
             return true;
         }
     }
-    public boolean findByName(String str) {
+    public Grade findByName(String str) {
 
         try {
             session = sessionFactory.openSession();
-            gradeDAO.findByName(str);
-            return true;
+            return gradeDAO.findByName(str);
+
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         } finally {
             if (session != null) {
                 session.close();

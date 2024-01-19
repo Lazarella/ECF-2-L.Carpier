@@ -1,6 +1,7 @@
 package School.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "grade")
@@ -21,7 +22,7 @@ public class Grade {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_student", nullable = false)
-    private Student idStudent;
+    private List<Student> idStudent;
 
     public Grade() {
     }

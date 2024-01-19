@@ -57,11 +57,11 @@ public class DepartementService extends BaseService  {
 
         try {
             session = sessionFactory.openSession();
-            departementDao.findByName(str);
-            return true;
+            return departementDao.findByName(str);
+
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         } finally {
             if (session != null) {
                 session.close();
@@ -100,4 +100,5 @@ public class DepartementService extends BaseService  {
             }
         }
     }
+
 }
